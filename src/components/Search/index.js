@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Radio, Input, Button } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import IPropTypes from 'react-immutable-proptypes';
+import { Map } from 'immutable';
 import { noop } from 'lodash';
 import { fetchIssues } from 'reducers/issues/action';
 
@@ -29,10 +31,10 @@ class Search extends Component {
     e.preventDefault();
 
     const { handleFetchIssues } = this.props;
+    const { data } = this.props;
     const { scope, query } = this.state;
-    console.log(query, 'query');
 
-    handleFetchIssues(scope, query);
+    handleFetchIssues(scope, query, data.get('pageSize'), data.get('currentPage'));
   };
 
   render() {
@@ -54,7 +56,7 @@ class Search extends Component {
         </RadioGroup>
 
         <div>
-          <Input type="text" placeholder="Search for repo" name="city" onChange={this.handleOnChangeQuery} />
+          <Input type="text" placeholder="Search for repo" name="city" onChange={this.handleOnChangeQuery} value={this.state.query} />
           <Button type="primary" icon="search" onClick={this.handleOnClick}>
             Search
           </Button>
@@ -66,17 +68,23 @@ class Search extends Component {
 
 Search.propTypes = {
   handleFetchIssues: PropTypes.func,
+  data: IPropTypes.map,
 };
 
 Search.defaultProps = {
   handleFetchIssues: noop,
+  data: Map(),
 };
 
+const mapStateToProps = state => ({
+  data: state.getIn(['issues', 'data']),
+});
+
 const mapDispatchToProps = dispatch => ({
-  handleFetchIssues: (scope, query) => dispatch(fetchIssues(scope, query)),
+  handleFetchIssues: (scope, query, pageSize, pageNumber) => dispatch(fetchIssues(scope, query, pageSize, pageNumber)),
 });
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(Search);

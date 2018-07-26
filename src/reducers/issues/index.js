@@ -5,23 +5,31 @@ const initialState = fromJS({
   currentQuery: null,
   isLoading: false,
   error: null,
-  items: {},
+  data: {
+    items: [],
+    total: 0,
+    pageSize: 10,
+    currentPage: 0,
+  },
 });
 
-export default function(state = initialState, { type, meta, payload }) {
+export default function(state = initialState, { type, meta, payload, error }) {
   switch (type) {
     case FETCH_POSTS_PENDING:
-      return state;
-    case FETCH_POSTS_FULFILLED:
-      return state.set('currentQuery', meta.query).setIn(['items', meta.query], fromJS(payload.data.items));
+      return state.merge({ isLoading: true, error: null });
     case FETCH_POSTS_REJECTED:
-      return state;
+      return state.merge({ isLoading: false, error });
+    case FETCH_POSTS_FULFILLED:
+      return state
+        .merge({ isLoading: false, error: null, currentQuery: meta.query })
+        .setIn(['data', 'items'], fromJS(payload.data.items))
+        .setIn(['data', 'total'], fromJS(payload.data.total_count));
 
     default:
       return state;
   }
 }
 
-export const getCurrentQuery = state => state.getIn(['issues', 'currentQuery']);
+// export const getCurrentQuery = state => state.getIn(['issues', 'currentQuery']);
 
-export const getCurrentItems = state => state.getIn(['issues', 'items', getCurrentQuery(state)]);
+// export const getCurrentItems = state => state.getIn(['issues', 'data', getCurrentQuery(state)]);

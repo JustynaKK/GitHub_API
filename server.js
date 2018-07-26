@@ -8,9 +8,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/search/:scope/:query', (req, res, next) => {
-  const { scope, query } = req.params;
-  axios(`https://api.github.com/search/${scope}?q=${query}+language:javascript&sort=stars&order=desc&page=100`)
+app.get('/search/:scope/:query/:pageSize/:pageNumber', (req, res, next) => {
+  const { scope, query, pageSize, pageNumber } = req.params;
+  axios(`https://api.github.com/search/${scope}?q=${query}+language:javascript&sort=stars&order=desc&per_page=${pageSize}&page=${pageNumber}`)
     .then(response => {
       res.send(response.data);
     })

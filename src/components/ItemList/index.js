@@ -1,62 +1,85 @@
-import React, { PureComponent } from 'react';
+/* eslint-disable */
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import IPropTypes from 'react-immutable-proptypes';
-import { List } from 'immutable';
+import { Map } from 'immutable';
+import { Table } from 'antd';
+import { noop } from 'lodash';
+import { fetchIssues } from 'reducers/issues/action';
 
-import { getCurrentItems } from 'reducers/issues';
+const columns = [
+  {
+    title: '#',
+    dataIndex: 'index',
+  },
+  {
+    title: 'ID',
+    dataIndex: 'id',
+  },
+  {
+    title: 'Name',
+    dataIndex: 'name',
+  },
+  {
+    title: 'Stars',
+    dataIndex: 'stargazers_count',
+    render: value => <span>{value} Stars </span>,
+  },
+];
 
-class ItemList extends PureComponent {
+class ItemList extends Component {
+  handleTableChange = (pagination, filters, sorter) => {
+    const { handleFetchIssues, query, data } = this.props;
+
+    handleFetchIssues('repositories', query, data.get('pageSize'), pagination.current);
+  };
+
   render() {
-    const { items } = this.props;
+    const { data } = this.props;
 
     return (
       <div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Repo Name</th>
-              <th>Stars Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, index) => (
-              <tr>
-                <td>{index + 1}</td>
-                <td>{item.get('name')}</td>
-                <td>{item.get('stargazers_count')} Stars</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {/* {items.map((Item) => <Item>{item.get('name')} </Item>)} */}
+        <p>dziwne</p>
+
+        <Table
+          rowKey={({ id }) => `${id}`}
+          dataSource={data
+            .get('items')
+            .map((el, index) => el.set('index', index + 1))
+            .toJS()}
+          columns={columns}
+          onChange={this.handleTableChange}
+          pagination={{
+            pageSize: data.get('pageSize'),
+            total: data.get('total'),
+          }}
+        />
       </div>
     );
   }
 }
 
 ItemList.propTypes = {
-  items: IPropTypes.list,
+  handleFetchIssues: PropTypes.func,
+  data: IPropTypes.map,
 };
 
 ItemList.defaultProps = {
-  items: List(),
+  handleFetchIssues: noop,
+  data: Map(),
 };
 
 const mapStateToProps = state => ({
-  items: getCurrentItems(state),
+  query: state.getIn(['issues', 'currentQuery']),
+  data: state.getIn(['issues', 'data']),
+});
+
+const mapDispatchToProps = dispatch => ({
+  handleFetchIssues: (scope, query, pageSize, pageNumber) => dispatch(fetchIssues(scope, query, pageSize, pageNumber)),
 });
 
 export default connect(
   mapStateToProps,
-  null,
+  mapDispatchToProps,
 )(ItemList);
-
-// const Item = ({ item, index }) => (
-//   <tr>
-//     <td>{index + 1}</td>
-//     <td>{item.get('name')}</td>
-//     <td>{item.get('stargazers_count')} Stars</td>
-//   </tr>
-// );
-// {items.map((item, index) => <Item item={item} index={index} key={item.id} />)}
