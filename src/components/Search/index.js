@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import { Radio, Input, Button } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import IPropTypes from 'react-immutable-proptypes';
-import { Map } from 'immutable';
 import { noop } from 'lodash';
-import { fetchIssues } from 'reducers/issues/action';
+import { setQuery, setScope } from 'reducers/content/action';
 
 const RadioGroup = Radio.Group;
 
@@ -22,19 +20,24 @@ class Search extends Component {
   };
 
   handleOnChangeScope = e => {
+    console.log('i am in scope', e.target.value);
+
     this.setState({
       scope: e.target.value,
     });
   };
 
   handleOnClick = e => {
+    console.log(this.state.scope);
+    console.log(this.state.query);
     e.preventDefault();
 
-    const { handleFetchIssues } = this.props;
-    const { data } = this.props;
-    const { scope, query } = this.state;
+    const { handleSetQuery, handleSetScope } = this.props;
+    const { query, scope } = this.state;
+    handleSetQuery(query);
+    handleSetScope(scope);
 
-    handleFetchIssues(scope, query, data.get('pageSize'), data.get('currentPage'));
+    // getContent();
   };
 
   render() {
@@ -50,8 +53,8 @@ class Search extends Component {
           <Radio style={radioStyle} value="repositories">
             Repsitories
           </Radio>
-          <Radio style={radioStyle} value="issues" disabled>
-            Issues
+          <Radio style={radioStyle} value="issues">
+            Content
           </Radio>
         </RadioGroup>
 
@@ -67,24 +70,21 @@ class Search extends Component {
 }
 
 Search.propTypes = {
-  handleFetchIssues: PropTypes.func,
-  data: IPropTypes.map,
+  handleSetQuery: PropTypes.func,
+  handleSetScope: PropTypes.func,
 };
 
 Search.defaultProps = {
-  handleFetchIssues: noop,
-  data: Map(),
+  handleSetQuery: noop,
+  handleSetScope: noop,
 };
 
-const mapStateToProps = state => ({
-  data: state.getIn(['issues', 'data']),
-});
-
 const mapDispatchToProps = dispatch => ({
-  handleFetchIssues: (scope, query, pageSize, pageNumber) => dispatch(fetchIssues(scope, query, pageSize, pageNumber)),
+  handleSetQuery: query => dispatch(setQuery(query)),
+  handleSetScope: scope => dispatch(setScope(scope)),
 });
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(Search);

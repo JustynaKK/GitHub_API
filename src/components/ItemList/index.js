@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -6,7 +5,7 @@ import IPropTypes from 'react-immutable-proptypes';
 import { Map } from 'immutable';
 import { Table } from 'antd';
 import { noop } from 'lodash';
-import { fetchIssues } from 'reducers/issues/action';
+import { setCurrentPage } from 'reducers/content/action';
 
 const columns = [
   {
@@ -29,14 +28,14 @@ const columns = [
 ];
 
 class ItemList extends Component {
-  handleTableChange = (pagination, filters, sorter) => {
-    const { handleFetchIssues, query, data } = this.props;
-
-    handleFetchIssues('repositories', query, data.get('pageSize'), pagination.current);
+  handleTableChange = pagination => {
+    const { handleSetCurrentPage } = this.props;
+    handleSetCurrentPage(pagination.current);
   };
 
   render() {
     const { data } = this.props;
+    console.log(data.toJS());
 
     return (
       <div>
@@ -61,22 +60,21 @@ class ItemList extends Component {
 }
 
 ItemList.propTypes = {
-  handleFetchIssues: PropTypes.func,
+  handleSetCurrentPage: PropTypes.func,
   data: IPropTypes.map,
 };
 
 ItemList.defaultProps = {
-  handleFetchIssues: noop,
+  handleSetCurrentPage: noop,
   data: Map(),
 };
 
 const mapStateToProps = state => ({
-  query: state.getIn(['issues', 'currentQuery']),
-  data: state.getIn(['issues', 'data']),
+  data: state.getIn(['content', 'data']),
 });
 
 const mapDispatchToProps = dispatch => ({
-  handleFetchIssues: (scope, query, pageSize, pageNumber) => dispatch(fetchIssues(scope, query, pageSize, pageNumber)),
+  handleSetCurrentPage: currentPage => dispatch(setCurrentPage(currentPage)),
 });
 
 export default connect(

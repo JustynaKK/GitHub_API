@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux-immutable';
-import issues from './issues';
+import content from './content';
 
 export default combineReducers({
-  issues,
+  content,
 });
