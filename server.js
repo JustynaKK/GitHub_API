@@ -8,10 +8,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/search/:scope/:query/:pageSize/:currentPage', (req, res, next) => {
-  const { scope, query, pageSize, currentPage } = req.params;
-  console.log(`https://api.github.com/search/${scope}?q=${query}+language:javascript&sort=stars&order=desc&per_page=${pageSize}&page=${currentPage}`);
-  axios(`https://api.github.com/search/${scope}?q=${query}+language:javascript&sort=stars&order=desc&per_page=${pageSize}&page=${currentPage}`)
+app.get('/search/:query/:pageSize/:currentPage', (req, res, next) => {
+  const { query, pageSize, currentPage } = req.params;
+  console.log(
+    `https://api.github.com/search/repositories?q=${query}+language:javascript&sort=stars&order=desc&per_page=${pageSize}&page=${currentPage}`,
+  );
+  axios(`https://api.github.com/search/repositories?q=${query}+language:javascript&sort=stars&order=desc&per_page=${pageSize}&page=${currentPage}`)
     .then(response => {
       res.send(response.data);
     })

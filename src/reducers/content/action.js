@@ -1,9 +1,9 @@
 import axios from 'axios';
 import * as types from './types';
 
-export const fetchContent = (scope, query, pageSize, currentPage) => ({
+export const fetchContent = (query, pageSize, currentPage) => ({
   type: types.FETCH_POSTS,
-  payload: axios(`/search/${scope}/${query}/${pageSize}/${currentPage}`),
+  payload: axios(`/search/${query}/${pageSize}/${currentPage}`),
 });
 
 export const setQuery = query => ({

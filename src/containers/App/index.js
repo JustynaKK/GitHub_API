@@ -10,8 +10,8 @@ import './styles.css';
 class App extends Component {
 
   componentDidUpdate() {
-    const { handleFetchContent, scope, query, pageSize, currentPage } = this.props;
-    handleFetchContent(scope, query, pageSize, currentPage);
+    const { handleFetchContent, query, pageSize, currentPage } = this.props;
+    handleFetchContent(query, pageSize, currentPage);
   }
 
   render() {
@@ -54,7 +54,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  handleFetchContent: (scope, query, pageSize, pageNumber) => dispatch(fetchContent(scope, query, pageSize, pageNumber)),
+  handleFetchContent: (query, pageSize, pageNumber) => dispatch(fetchContent(query, pageSize, pageNumber)),
 });
 
 export default connect(
