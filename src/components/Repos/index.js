@@ -1,3 +1,4 @@
+/*eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -8,15 +9,14 @@ import { noop } from 'lodash';
 import { setCurrentPage } from 'reducers/content/action';
 import { Link } from 'react-router-dom';
 
-class ItemList extends Component {
+class Repos extends Component {
   handleListChange = page => {
-    console.log(page);
     const { handleSetCurrentPage } = this.props;
     handleSetCurrentPage(page);
   };
 
   render() {
-    const { data, pageSize } = this.props;
+    const { repos, pageSize } = this.props;
 
     const IconText = ({ type, text }) => (
       <span>
@@ -28,31 +28,30 @@ class ItemList extends Component {
     return (
       <div>
         <List
-          // itemLayout="vertical"
           pagination={{
             onChange: this.handleListChange,
             pageSize,
-            total: data.get('total'),
+            total: repos.get('total'),
           }}
-          dataSource={data.get('items').toJS()}
+          dataSource={repos.get('items').toJS()}
           renderItem={item => (
-            console.log(item.open_issues_count),
-            (
-              <List.Item
-                key={item.id}
-                actions={[
-                  <IconText type="star-o" text={item.stargazers_count} />,
-                  <IconText type="fork" text={item.forks_count} />,
-                  <IconText type="exclamation-circle-o" text={`Issues: ${item.open_issues_count}`} />,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar shape="square" src={item.owner.avatar_url} size="large" />}
-                  title={<a href={item.html_url}>{item.full_name}</a>}
-                  description={<Link to={/}/>}
-                />
-              </List.Item>
-            )
+            <List.Item
+              key={item.id}
+              actions={[
+                <IconText type="star-o" text={item.stargazers_count} />,
+                <IconText type="fork" text={item.forks_count} />,
+                <IconText
+                  type={'exclamation-circle-o'}
+                  text={<Link to={`/${item.owner.login}/${item.name}/issues`}> Issues: {item.open_issues_count} </Link>}
+                />,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={<Avatar shape="square" src={item.owner.avatar_url} size="large" />}
+                title={<a href={item.html_url}>{item.full_name}</a>}
+                description={item.description}
+              />
+            </List.Item>
           )}
         />
       </div>
@@ -60,20 +59,20 @@ class ItemList extends Component {
   }
 }
 
-ItemList.propTypes = {
+Repos.propTypes = {
   handleSetCurrentPage: PropTypes.func,
   pageSize: PropTypes.number,
-  data: IPropTypes.map,
+  repos: IPropTypes.map,
 };
 
-ItemList.defaultProps = {
+Repos.defaultProps = {
   handleSetCurrentPage: noop,
-  data: Map(),
+  repos: Map(),
   pageSize: 10,
 };
 
 const mapStateToProps = state => ({
-  data: state.getIn(['content', 'data']),
+  repos: state.getIn(['content', 'repos']),
   pageSize: state.getIn(['content', 'pageSize']),
 });
 
@@ -84,4 +83,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(ItemList);
+)(Repos);

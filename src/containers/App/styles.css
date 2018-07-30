@@ -23,7 +23,8 @@
 }
 
 .wrapper {
-  margin: 30px 50px;
+  max-width: 1000px;
+  margin: 30px auto;
 }
 
 .wrapper .ant-input {

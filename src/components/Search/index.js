@@ -17,7 +17,6 @@ class Search extends Component {
   };
 
   handleOnClick = e => {
-    console.log(this.state.query);
     e.preventDefault();
 
     const { handleSetQuery } = this.props;
