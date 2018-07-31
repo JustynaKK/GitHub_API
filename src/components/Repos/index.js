@@ -1,4 +1,3 @@
-/*eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -6,13 +5,12 @@ import IPropTypes from 'react-immutable-proptypes';
 import { Map } from 'immutable';
 import { List, Avatar, Icon } from 'antd';
 import { noop } from 'lodash';
-import { setCurrentPage } from 'reducers/content/action';
 import { Link } from 'react-router-dom';
 
 class Repos extends Component {
   handleListChange = page => {
-    const { handleSetCurrentPage } = this.props;
-    handleSetCurrentPage(page);
+    const { setPage } = this.props;
+    setPage(page);
   };
 
   render() {
@@ -41,7 +39,7 @@ class Repos extends Component {
                 <IconText type="star-o" text={item.stargazers_count} />,
                 <IconText type="fork" text={item.forks_count} />,
                 <IconText
-                  type={'exclamation-circle-o'}
+                  type="exclamation-circle-o"
                   text={<Link to={`/${item.owner.login}/${item.name}/issues`}> Issues: {item.open_issues_count} </Link>}
                 />,
               ]}
@@ -60,13 +58,13 @@ class Repos extends Component {
 }
 
 Repos.propTypes = {
-  handleSetCurrentPage: PropTypes.func,
+  setPage: PropTypes.func,
   pageSize: PropTypes.number,
   repos: IPropTypes.map,
 };
 
 Repos.defaultProps = {
-  handleSetCurrentPage: noop,
+  setPage: noop,
   repos: Map(),
   pageSize: 10,
 };
@@ -76,11 +74,4 @@ const mapStateToProps = state => ({
   pageSize: state.getIn(['content', 'pageSize']),
 });
 
-const mapDispatchToProps = dispatch => ({
-  handleSetCurrentPage: currentPage => dispatch(setCurrentPage(currentPage)),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Repos);
+export default connect(mapStateToProps)(Repos);

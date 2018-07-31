@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Button } from 'antd';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { noop } from 'lodash';
-import { setQuery } from 'reducers/content/action';
 
 class Search extends Component {
   state = {
@@ -18,12 +16,9 @@ class Search extends Component {
 
   handleOnClick = e => {
     e.preventDefault();
-
-    const { handleSetQuery } = this.props;
+    const { setQuery } = this.props;
     const { query } = this.state;
-    handleSetQuery(query);
-
-    // getContent();
+    setQuery(query);
   };
 
   render() {
@@ -41,18 +36,11 @@ class Search extends Component {
 }
 
 Search.propTypes = {
-  handleSetQuery: PropTypes.func,
+  setQuery: PropTypes.func,
 };
 
 Search.defaultProps = {
-  handleSetQuery: noop,
+  setQuery: noop,
 };
 
-const mapDispatchToProps = dispatch => ({
-  handleSetQuery: query => dispatch(setQuery(query)),
-});
-
-export default connect(
-  null,
-  mapDispatchToProps,
-)(Search);
+export default Search;

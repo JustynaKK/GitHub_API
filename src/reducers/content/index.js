@@ -1,15 +1,6 @@
 import { fromJS } from 'immutable';
-import {
-  FETCH_REPOS_PENDING,
-  FETCH_REPOS_REJECTED,
-  FETCH_REPOS_FULFILLED,
-  SET_QUERY,
-  SET_SCOPE,
-  SET_CURRENTPAGE,
-  FETCH_ISSUES_FULFILLED,
-  FETCH_ISSUE_SINGLE_FULFILLED,
-  FETCH_ISSUE_COMMENTS_FULFILLED,
-} from './types';
+import typeToReducer from 'type-to-reducer';
+import * as types from './types';
 
 const initialState = fromJS({
   currentQuery: null,
@@ -24,39 +15,27 @@ const initialState = fromJS({
   issues: {
     items: {},
   },
-  issue: {},
-  comments: [],
 });
 
-export default function(state = initialState, { type, payload, error }) {
-  switch (type) {
-    case SET_QUERY:
-      return state.set('currentQuery', payload);
-    case SET_SCOPE:
-      return state.set('currentScope', payload);
-    case SET_CURRENTPAGE:
-      return state.set('currentPage', payload);
-    case FETCH_REPOS_PENDING:
-      return state.merge({ isLoading: true, error: null });
-    case FETCH_REPOS_REJECTED:
-      return state.merge({ isLoading: false, error });
-    case FETCH_REPOS_FULFILLED:
-      return state
-        .merge({ isLoading: false, error: null })
-        .setIn(['repos', 'items'], fromJS(payload.data.items))
-        .setIn(['repos', 'total'], fromJS(payload.data.total_count));
-    case FETCH_ISSUES_FULFILLED:
-      return state.merge({ isLoading: false, error: null }).setIn(['issues', 'items'], fromJS(payload.data));
-    case FETCH_ISSUE_SINGLE_FULFILLED:
-      return state.merge({ isLoading: false, error: null }).setIn(['issue'], fromJS(payload.data));
-    case FETCH_ISSUE_COMMENTS_FULFILLED:
-      return state.merge({ isLoading: false, error: null }).setIn(['comments'], fromJS(payload.data));
+export default typeToReducer(
+  {
+    [types.SET_QUERY]: (state, { payload }) => state.set('currentQuery', payload),
+    [types.SET_CURRENTPAGE]: (state, { payload }) => state.set('currentPage', payload),
 
-    default:
-      return state;
-  }
-}
-
-// export const getCurrentQuery = state => state.getIn(['content', 'currentQuery']);
-
-// export const getCurrentItems = state => state.getIn(['content', 'repos', getCurrentQuery(state)]);
+    [types.FETCH_REPOS]: {
+      PENDING: state => state.merge({ isLoading: true, error: null }),
+      REJECTED: (state, { error }) => state.merge({ isLoading: false, error }),
+      FULFILLED: (state, { payload: { data } }) =>
+        state
+          .merge({ isLoading: false, error: null })
+          .setIn(['repos', 'items'], fromJS(data.items))
+          .setIn(['repos', 'total'], fromJS(data.total_count)),
+    },
+    [types.FETCH_ISSUES]: {
+      PENDING: state => state.merge({ isLoading: true, error: null }),
+      REJECTED: (state, { error }) => state.merge({ isLoading: false, error }),
+      FULFILLED: (state, { payload: { data } }) => state.merge({ isLoading: false, error: null }).setIn(['issues', 'items'], fromJS(data)),
+    },
+  },
+  initialState,
+);
